@@ -9,7 +9,11 @@ class SplashScreen extends StatelessWidget {
     goToHome(context);
     return Scaffold(
       body: Center(
-        child: Image.asset('assets/images/pngwing.com.png'),
+        child: Image.asset(
+          'assets/images/pngwing.com.png',
+          height: 80,
+          width: 80,
+        ),
       ),
     );
   }

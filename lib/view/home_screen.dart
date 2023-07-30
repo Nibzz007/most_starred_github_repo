@@ -13,16 +13,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
-    Provider.of<GitHubRepoDataProvider>(context, listen: false).getGitHubData();
     super.initState();
+    Provider.of<GitHubRepoDataProvider>(context, listen: false).getGitHubData();
+    _scrollController.addListener(() {
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.position.pixels;
+      if (maxScroll == currentScroll) {
+        Provider.of<GitHubRepoDataProvider>(context, listen: false)
+            .loadMoreData();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<GitHubRepoDataProvider>(context);
-    final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kBlack,
@@ -46,26 +55,71 @@ class _HomeScreenState extends State<HomeScreen> {
           : Padding(
               padding: const EdgeInsets.all(10),
               child: ListView.separated(
+                controller: _scrollController,
                 itemBuilder: (context, index) {
-                  return Container(
-                    height: height * 0.15,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(color: kAmber),
-                    child: Row(
-                      children: [
-                        kWidth10,
-                        CircleAvatar(
-                          radius: 35,
-                          backgroundImage: NetworkImage(provider.gitHubModel!.items[index].owner.avatarUrl),
-                        )
-                      ],
-                    ),
-                  );
+                  if (index == provider.itemList.length) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (index > provider.itemList.length) {
+                    return const Text('No more items available');
+                  } else {
+                    final item = provider.itemList[index];
+                    return ListTile(
+                      tileColor: kBlack12,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      leading: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(item.owner.avatarUrl),
+                      ),
+                      title: Text(
+                        item.fullName.toUpperCase(),
+                        style: listTileTitleStyle,
+                      ),
+                      subtitle: Text(
+                        item.description ?? 'No description available',
+                        style: listTileDescriptionStyle,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star_border,
+                            size: 20,
+                            color: kBlack,
+                          ),
+                          kWidth5,
+                          Text(
+                            item.stargazersCount.toString(),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: kBlack,
+                              title: Text(
+                                item.name.toUpperCase(),
+                                style: alertDialogTitleStyle,
+                              ),
+                              content: Text(
+                                item.description ?? 'No description',
+                                style: alertDialogDescriptionStyle,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
                 },
-                separatorBuilder: (context, index) {
-                  return kHeight10;
-                },
-                itemCount: provider.gitHubModel!.items.length,
+                separatorBuilder: (context, index) => kHeight10,
+                itemCount: provider.itemList.length + 1,
               ),
             ),
     );
