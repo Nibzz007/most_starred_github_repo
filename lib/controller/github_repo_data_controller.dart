@@ -8,7 +8,7 @@ class GitHubRepoDataProvider extends ChangeNotifier {
   bool isLoading = false;
   List<Item> itemList = [];
   int currentPage = 1;
-  int perPage = 8;
+  int perPage = 10;
 
   Future<void> getRepo(int page) async {
     try {
@@ -25,7 +25,7 @@ class GitHubRepoDataProvider extends ChangeNotifier {
         log('Error occurred');
       }
     } catch (e) {
-      throw Exception("Error occurred, ${e.toString()}");
+      throw Exception(e);
     }
   }
 
@@ -40,36 +40,4 @@ class GitHubRepoDataProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-  // bool isLoading = false;
-  // GitHubModel? gitHubModel;
-  // List<Item> itemList = [];
-  // int currentPage = 1;
-  // int perPage = 6;
-
-  // // Function for getting the data 
-
-  // Future<GitHubModel?> getRepo() async {
-  //   try {
-  //     String baseUrl =
-  //         'https://api.github.com/search/repositories?q=created:>2022-04-29&sort=stars&order=desc';
-  //     Uri url = Uri.parse(baseUrl);
-  //     final response = await http.get(url);
-  //     if (response.statusCode == 200) {
-  //       GitHubModel data = GitHubModel.fromJson(jsonDecode(response.body));
-  //       return data;
-  //     } else {
-  //       log('Error occured');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error occured, $e.toString()');
-  //   }
-  //   return null;
-  // }
-
-  // void getGitHubData() async {
-  //   isLoading = true;
-  //   gitHubModel = await getRepo();
-  //   isLoading = false;
-  //   notifyListeners();
-  // }
 }
