@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:thiran_tech_task_2/model/github_most_starred_repo_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,10 +11,17 @@ class GitHubRepoDataProvider extends ChangeNotifier {
   int currentPage = 1;
   int perPage = 10;
 
+  getDate() {
+    var now = DateTime.now();
+    var lastThirtyDays = now.subtract(const Duration(days: 30));
+    var format = DateFormat('yyyy-MM-dd').format(lastThirtyDays);
+    return format;
+  }
+
   Future<void> getRepo(int page) async {
     try {
       String baseUrl =
-          'https://api.github.com/search/repositories?q=created:>2022-04-29&sort=stars&order=desc&page=$page&per_page=$perPage';
+          'https://api.github.com/search/repositories?q=created:>${getDate()}&sort=stars&order=desc&page=$page&per_page=$perPage';
       Uri url = Uri.parse(baseUrl);
       final response = await http.get(url);
       if (response.statusCode == 200) {
