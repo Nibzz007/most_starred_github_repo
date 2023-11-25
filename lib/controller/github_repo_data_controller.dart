@@ -28,7 +28,6 @@ class GitHubRepoDataProvider extends ChangeNotifier {
         final jsonData = jsonDecode(response.body);
         final List<Item> newItems = GitHubModel.fromJson(jsonData).items;
         itemList.addAll(newItems);
-        notifyListeners();
       } else {
         log('Error occurred');
       }
